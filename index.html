@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Coffee Management</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --card-bg: #1a202c; /* Make the card background significantly darker */
+            --accent: #edb463; /* Lighten the accent color for better contrast on dark */
+            --danger: #ef4444; /* Red for alerts */
+            --success: #10b981; /* Green for ready */
+            --text-main: #f8fafc; /* Lighter main text for dark card background */
+            --text-dim: #94a3b8; /* Lighter dim text for dark card background */
+            --border-color: #2d3748; /* Darker border for dark card background */
+            --accent-on-dark: #382621; /* Maintain the original coffee accent elsewhere */
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 40px 20px;
+            color: #1e293b; /* Set a default text color for non-card areas */
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem; /* Bigger Font */
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin: 0;
+            color: var(--accent-on-dark);
+            text-transform: uppercase;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 32px;
+            padding: 30px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); /* Slightly stronger shadow for dark card */
+            color: var(--text-main); /* Ensure main text is light within the card */
+        }
+
+        .table-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Active Call State */
+        .table-card.active-call {
+            border-color: var(--danger);
+            background: #2a1f1f; /* A very dark, subtle red-tinted background when active */
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .table-id {
+            font-size: 2rem; /* Bigger Font */
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        /* Battery Styling */
+        .battery-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.2rem; /* Bigger Font */
+            font-weight: 600;
+            color: var(--text-dim);
+        }
+
+        .battery-shell {
+            width: 50px;
+            height: 24px;
+            border: 3px solid #4a5568; /* Darker battery shell for contrast */
+            border-radius: 6px;
+            padding: 2px;
+            position: relative;
+        }
+
+        .battery-shell::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            top: 5px;
+            width: 4px;
+            height: 8px;
+            background: #4a5568; /* Match the shell color */
+            border-radius: 0 3px 3px 0;
+        }
+
+        .battery-level {
+            height: 100%;
+            background: var(--success);
+            border-radius: 2px;
+        }
+
+        .low-battery .battery-level { background: var(--danger); }
+
+        /* Visual Table Representation */
+        .visual-box {
+            background: #2d3748; /* Darker visual box inside the card */
+            height: 150px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4.5rem; /* Bigger Emoji */
+            border: 2px solid var(--border-color);
+        }
+
+        /* Status Zone */
+        .status-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            border-radius: 18px;
+            background: #2d3748; /* Darker background for status zone */
+            border: 1px solid var(--border-color);
+        }
+
+        /* Voyant Logic */
+        .voyant {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--success); /* Default Green */
+        }
+
+        .active-call .voyant {
+            background: var(--danger); /* Red when waiting */
+            box-shadow: 0 0 20px var(--danger);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .status-text {
+            font-size: 1.3rem; /* Bigger Font */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--success); /* Default Green Text */
+        }
+
+        .active-call .status-text {
+            color: var(--danger); /* Red text when waiting */
+        }
+
+        /* Action Button */
+        .btn-respond {
+            width: 100%;
+            margin-top: 20px;
+            padding: 20px;
+            border: none;
+            border-radius: 16px;
+            background: var(--danger);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: none;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4); /* Stronger shadow on dark background */
+        }
+
+        .active-call .btn-respond {
+            display: block;
+        }
+
+        .btn-respond:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Restaurant Coffee Dashboard
+</h1>
+    </div>
+
+    <div class="dashboard">
+        <div class="table-card active-call" id="t1">
+            <div class="table-header">
+                <span class="table-id">TABLE 01</span>
+                <div class="battery-meta">
+                    <span>88%</span>
+                    <div class="battery-shell">
+                        <div class="battery-level" style="width: 88%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-box">🍽️</div>
+            <div class="status-zone">
+                <div class="voyant"></div>
+                <span class="status-text">Client Waiting</span>
+            </div>
+            <button class="btn-respond" onclick="dismiss(1)">DISMISS ALERT</button>
+        </div>
+        
+        <div class="table-card" id="t4">
+            <div class="table-header">
+                <span class="table-id">TABLE 04</span>
+                <div class="battery-meta">
+                    <span>60%</span>
+                    <div class="battery-shell">
+                        <div class="battery-level" style="width: 60%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-box">🍽️</div>
+            <div class="status-zone">
+                <div class="voyant"></div>
+                <span class="status-text">Ready</span>
+            </div>
+            <button class="btn-respond" onclick="dismiss(4)">DISMISS ALERT</button>
+        </div>
+
+        <div class="table-card active-call" id="t2">
+            <div class="table-header">
+                <span class="table-id">TABLE 02</span>
+                <div class="battery-meta">
+                    <span>72%</span>
+                    <div class="battery-shell">
+                        <div class="battery-level" style="width: 72%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-box">🍽️</div>
+            <div class="status-zone">
+                <div class="voyant"></div>
+                <span class="status-text">Client Waiting</span>
+            </div>
+            <button class="btn-respond" onclick="dismiss(2)">DISMISS ALERT</button>
+        </div>
+        
+        <div class="table-card" id="t5">
+            <div class="table-header">
+                <span class="table-id">TABLE 05</span>
+                <div class="battery-meta">
+                    <span>34%</span>
+                    <div class="battery-shell">
+                        <div class="battery-level" style="width: 34%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-box">🍽️</div>
+            <div class="status-zone">
+                <div class="voyant"></div>
+                <span class="status-text">Ready</span>
+            </div>
+            <button class="btn-respond" onclick="dismiss(5)">DISMISS ALERT</button>
+        </div>
+        
+        <div class="table-card active-call" id="t3">
+            <div class="table-header">
+                <span class="table-id">TABLE 03</span>
+                <div class="battery-meta low-battery">
+                    <span>12%</span>
+                    <div class="battery-shell">
+                        <div class="battery-level" style="width: 12%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-box">🍽️</div>
+            <div class="status-zone">
+                <div class="voyant"></div>
+                <span class="status-text">Client Waiting</span>
+            </div>
+            <button class="btn-respond" onclick="dismiss(3)">DISMISS ALERT</button>
+        </div>
+
+        <div class="table-card" id="t6">
+            <div class="table-header">
+                <span class="table-id">TABLE 06</span>
+                <div class="battery-meta">
+                    <span>98%</span>
+                    <div class="battery-shell">
+                        <div class="battery-level" style="width: 98%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="visual-box">🍽️</div>
+            <div class="status-zone">
+                <div class="voyant"></div>
+                <span class="status-text">Ready</span>
+            </div>
+            <button class="btn-respond" onclick="dismiss(6)">DISMISS ALERT</button>
+        </div>
+    </div>
+
+    <script>
+        function dismiss(id) {
+            const card = document.getElementById('t' + id);
+            card.classList.remove('active-call');
+            const text = card.querySelector('.status-text');
+            text.innerText = "Ready";
+            // The CSS naturally handles the voyant turning green and text changing color 
+            // once the 'active-call' class is removed.
+        }
+    </script>
+</body>
+</html>
