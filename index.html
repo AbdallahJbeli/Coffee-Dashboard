@@ -1,333 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Coffee Management</title>
-    <style>
-        :root {
-            --bg: #ffffff;
-            --card-bg: #1a202c; 
-            --accent: #edb463; 
-            --danger: #ef4444; 
-            --success: #10b981; 
-            --text-main: #f8fafc; 
-            --text-dim: #94a3b8; 
-            --border-color: #2d3748; 
-            --accent-on-dark: #382621; 
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coffee Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 40px 20px;
-            color: #1e293b; 
-            min-height: 100vh;
-        }
+    :root {
+      --bg:         #e8e0d0;
+      --surface:    #1e1408;
+      --surface-2:  #2a1c10;
+      --border:     #3a2818;
+      --accent:     #c8732a;
+      --warn:       #e03020;
+      --warn-bg:    #2e1008;
+      --warn-bd:    #6a1e14;
+      --ok:         #4ab85a;
+      --ok-bg:      #0e2212;
+      --text:       #f8f0e4;
+      --text-2:     #c09a7a;
+      --text-3:     #7a6050;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 60px;
-        }
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 40px 24px 60px;
+    }
 
-        .header h1 {
-            font-size: 3.5rem; 
-            font-weight: 900;
-            letter-spacing: -2px;
-            margin: 0;
-            color: var(--accent-on-dark);
-            text-transform: uppercase;
-        }
+    header {
+      max-width: 1320px;
+      margin: 0 auto 36px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      border-bottom: 1.5px solid #b09870;
+      padding-bottom: 24px;
+    }
 
-        .dashboard {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 30px;
-        }
+    .logo-block h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+      line-height: 1;
+    }
 
-        .table-card {
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 32px;
-            padding: 30px;
-            position: relative;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            color: var(--text-main);
-        }
+    .logo-block p {
+      font-size: 12px;
+      color: #7a6050;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
 
-        .table-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
+    .clock {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      color: #6b5030;
+      text-align: right;
+      line-height: 1.6;
+    }
 
-        /* Active Call State */
-        .table-card.active-call {
-            border-color: var(--danger);
-            background: #2a1f1f; 
-        }
+    .clock strong {
+      display: block;
+      font-size: 24px;
+      color: #2a1f14;
+      letter-spacing: -0.02em;
+    }
 
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+    .summary {
+      max-width: 1320px;
+      margin: 0 auto 32px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
 
-        .table-id {
-            font-size: 2rem; 
-            font-weight: 800;
-            color: var(--accent);
-        }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-        /* Battery Styling */
-        .battery-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.2rem; 
-            font-weight: 600;
-            color: var(--text-dim);
-        }
+    .stat-label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
 
-        .battery-shell {
-            width: 50px;
-            height: 24px;
-            border: 3px solid #4a5568; 
-            border-radius: 6px;
-            padding: 2px;
-            position: relative;
-        }
+    .stat-val {
+      font-family: 'Fraunces', serif;
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text);
+    }
 
-        .battery-shell::after {
-            content: '';
-            position: absolute;
-            right: -7px;
-            top: 5px;
-            width: 4px;
-            height: 8px;
-            background: #4a5568; 
-            border-radius: 0 3px 3px 0;
-        }
+    .stat-val.red   { color: #ff5040; }
+    .stat-val.green { color: var(--ok); }
 
-        .battery-level {
-            height: 100%;
-            background: var(--success);
-            border-radius: 2px;
-        }
+    .grid {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
 
-        .low-battery .battery-level { background: var(--danger); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: transform 0.25s, box-shadow 0.25s, background 0.3s, border 0.3s;
+      animation: fadeIn 0.35s ease both;
+      color: var(--text);
+      font-size: 14px;
+    }
 
-        
-        .visual-box {
-            background: #2d3748; 
-            height: 150px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4.5rem; 
-            border: 2px solid var(--border-color);
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-        
-        .status-zone {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            padding: 20px;
-            border-radius: 18px;
-            background: #2d3748; 
-            border: 1px solid var(--border-color);
-        }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(0,0,0,0.5);
+    }
 
-        
-        .voyant {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--success); 
-        }
+    .card.calling {
+      border: 1.5px solid var(--warn-bd);
+      background: var(--warn-bg);
+    }
 
-        .active-call .voyant {
-            background: var(--danger); 
-            box-shadow: 0 0 20px var(--danger);
-            animation: blink 1s infinite;
-        }
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
+    .table-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
 
-        .status-text {
-            font-size: 1.3rem; 
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--success); 
-        }
+    .table-num {
+      font-family: 'Fraunces', serif;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
 
-        .active-call .status-text {
-            color: var(--danger);
-        }
+    .batt-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
 
-        /* Action Button */
-        .btn-respond {
-            width: 100%;
-            margin-top: 20px;
-            padding: 20px;
-            border: none;
-            border-radius: 16px;
-            background: var(--danger);
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 800;
-            cursor: pointer;
-            display: none;
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4); 
-        }
+    .batt-shell {
+      width: 50px; height: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 5px;
+      position: relative;
+      padding: 2px;
+    }
 
-        .active-call .btn-respond {
-            display: block;
-        }
+    .batt-shell::after {
+      content: '';
+      position: absolute;
+      right: -5px; top: 50%;
+      transform: translateY(-50%);
+      width: 4px; height: 10px;
+      background: var(--border);
+      border-radius: 0 2px 2px 0;
+    }
 
-        .btn-respond:hover {
-            filter: brightness(1.1);
-            transform: scale(1.02);
-        }
+    .batt-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
 
-    </style>
+    .batt-pct {
+      font-size: 14px;
+      color: var(--text);
+      letter-spacing: 0.04em;
+      font-weight: 600;
+    }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-height: 46px;
+    }
+
+    .card-icon {
+      font-size: 42px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+
+    .card-alert {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .card-alert-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--warn);
+      flex-shrink: 0;
+      animation: pulse 1s infinite;
+    }
+
+    .card .table-label,
+    .card .table-num,
+    .card .batt-pct,
+    .card .status-text {
+      color: var(--text);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .card.calling .divider { background: var(--warn-bd); }
+
+    /* Status ready */
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 13px;
+      border-radius: 10px;
+      background: var(--ok-bg);
+    }
+
+    .card.calling .status { display: none; }
+    .card:not(.calling) .card-alert { display: none; }
+
+    .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--ok);
+      flex-shrink: 0;
+    }
+
+    .status-text {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(224,48,32,0.8); }
+      70%  { box-shadow: 0 0 0 12px rgba(224,48,32,0); }
+      100% { box-shadow: 0 0 0 0 rgba(224,48,32,0); }
+    }
+
+    /* Confirm button */
+    .btn-confirm {
+      display: none;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: var(--warn);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .card.calling .btn-confirm { display: block; }
+
+    .btn-confirm:hover  { background: #b01e10; }
+    .btn-confirm:active { transform: scale(0.98); }
+
+    @media (max-width: 500px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .clock { text-align: left; }
+      .summary { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Restaurant Coffee Dashboard
-</h1>
+  <header>
+    <div class="logo-block">
+      <h1>Café Manager</h1>
+      <p>Table call system · Live view</p>
     </div>
-
-    <div class="dashboard">
-        <div class="table-card active-call" id="t1">
-            <div class="table-header">
-                <span class="table-id">TABLE 01</span>
-                <div class="battery-meta">
-                    <span>88%</span>
-                    <div class="battery-shell">
-                        <div class="battery-level" style="width: 88%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="visual-box">🍽️</div>
-            <div class="status-zone">
-                <div class="voyant"></div>
-                <span class="status-text">Client Waiting</span>
-            </div>
-            <button class="btn-respond" onclick="dismiss(1)">DISMISS ALERT</button>
-        </div>
-        
-        <div class="table-card" id="t4">
-            <div class="table-header">
-                <span class="table-id">TABLE 04</span>
-                <div class="battery-meta">
-                    <span>60%</span>
-                    <div class="battery-shell">
-                        <div class="battery-level" style="width: 60%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="visual-box">🍽️</div>
-            <div class="status-zone">
-                <div class="voyant"></div>
-                <span class="status-text">Ready</span>
-            </div>
-            <button class="btn-respond" onclick="dismiss(4)">DISMISS ALERT</button>
-        </div>
-
-        <div class="table-card active-call" id="t2">
-            <div class="table-header">
-                <span class="table-id">TABLE 02</span>
-                <div class="battery-meta">
-                    <span>72%</span>
-                    <div class="battery-shell">
-                        <div class="battery-level" style="width: 72%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="visual-box">🍽️</div>
-            <div class="status-zone">
-                <div class="voyant"></div>
-                <span class="status-text">Client Waiting</span>
-            </div>
-            <button class="btn-respond" onclick="dismiss(2)">DISMISS ALERT</button>
-        </div>
-        
-        <div class="table-card" id="t5">
-            <div class="table-header">
-                <span class="table-id">TABLE 05</span>
-                <div class="battery-meta">
-                    <span>34%</span>
-                    <div class="battery-shell">
-                        <div class="battery-level" style="width: 34%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="visual-box">🍽️</div>
-            <div class="status-zone">
-                <div class="voyant"></div>
-                <span class="status-text">Ready</span>
-            </div>
-            <button class="btn-respond" onclick="dismiss(5)">DISMISS ALERT</button>
-        </div>
-        
-        <div class="table-card active-call" id="t3">
-            <div class="table-header">
-                <span class="table-id">TABLE 03</span>
-                <div class="battery-meta low-battery">
-                    <span>12%</span>
-                    <div class="battery-shell">
-                        <div class="battery-level" style="width: 12%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="visual-box">🍽️</div>
-            <div class="status-zone">
-                <div class="voyant"></div>
-                <span class="status-text">Client Waiting</span>
-            </div>
-            <button class="btn-respond" onclick="dismiss(3)">DISMISS ALERT</button>
-        </div>
-
-        <div class="table-card" id="t6">
-            <div class="table-header">
-                <span class="table-id">TABLE 06</span>
-                <div class="battery-meta">
-                    <span>98%</span>
-                    <div class="battery-shell">
-                        <div class="battery-level" style="width: 98%"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="visual-box">🍽️</div>
-            <div class="status-zone">
-                <div class="voyant"></div>
-                <span class="status-text">Ready</span>
-            </div>
-            <button class="btn-respond" onclick="dismiss(6)">DISMISS ALERT</button>
-        </div>
+    <div class="clock">
+      <strong id="clock-time">--:--</strong>
+      <span id="clock-date">Loading…</span>
     </div>
+  </header>
 
-    <script>
-        function dismiss(id) {
-            const card = document.getElementById('t' + id);
-            card.classList.remove('active-call');
-            const text = card.querySelector('.status-text');
-            text.innerText = "Ready";
+  <div class="summary" id="summary"></div>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    const tables = [
+      { id:"01", batt:88, waiting:true,  icon:"☕" },
+      { id:"02", batt:72, waiting:true,  icon:"☕" },
+      { id:"03", batt:12, waiting:true,  icon:"☕" },
+      { id:"04", batt:60, waiting:false, icon:"☕" },
+      { id:"05", batt:34, waiting:false, icon:"☕" },
+      { id:"06", batt:98, waiting:false, icon:"☕" },
+      { id:"07", batt:45, waiting:true,  icon:"☕" },
+      { id:"08", batt:82, waiting:false, icon:"☕" },
+      { id:"09", batt:19, waiting:false, icon:"☕" },
+      { id:"10", batt:91, waiting:true,  icon:"☕" },
+      { id:"11", batt:55, waiting:false, icon:"☕" },
+      { id:"12", batt:67, waiting:false, icon:"☕" }
+    ];
+
+    function battColor(p) {
+      if (p < 20) return '#e03020';
+      if (p < 40) return '#d08020';
+      return '#4ab85a';
+    }
+
+    function updateSummary() {
+      const calling = tables.filter(t => t.waiting).length;
+      const lowBatt = tables.filter(t => t.batt < 20).length;
+      const ready   = tables.length - calling;
+      document.getElementById('summary').innerHTML = `
+        <div class="stat">
+          <span class="stat-label">Calling</span>
+          <span class="stat-val ${calling > 0 ? 'red' : 'green'}">${calling}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Low battery</span>
+          <span class="stat-val ${lowBatt > 0 ? 'red' : ''}">${lowBatt}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Ready</span>
+          <span class="stat-val green">${ready}</span>
+        </div>
+      `;
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('grid');
+      grid.innerHTML = '';
+      tables.forEach((t, i) => {
+        const card = document.createElement('div');
+        card.className = 'card' + (t.waiting ? ' calling' : '');
+        card.id = 'card-' + t.id;
+        card.style.animationDelay = (i * 0.04) + 's';
+        card.innerHTML = `
+          <div class="card-top">
+            <div>
+              <div class="table-label">Table</div>
+              <div class="table-num">${t.id}</div>
+            </div>
+            <div class="batt-wrap">
+              <div class="batt-shell">
+                <div class="batt-fill" style="width:${t.batt}%; background:${battColor(t.batt)}"></div>
+              </div>
+              <span class="batt-pct">${t.batt}%</span>
+            </div>
+          </div>
+          <div class="card-meta">
+            <div class="card-icon">${t.icon}</div>
+            <div class="card-alert">
+              <span class="card-alert-dot"></span>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="status">
+            <div class="dot"></div>
+            <span class="status-text">Ready</span>
+          </div>
+          <button type="button" class="btn-confirm" onclick="dismiss(event, '${t.id}')">Confirm receipt</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function dismiss(event, id) {
+      event.preventDefault();
+      const idx = tables.findIndex(t => t.id === id);
+      
+      if (idx > -1) {
+        // 1. Update the data
+        tables[idx].waiting = false;
+
+        const card = document.getElementById('card-' + id);
+        if (card) {
+          card.classList.remove('calling');
         }
-    </script>
+
+        
+        updateSummary();
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock-time').textContent =
+        now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      document.getElementById('clock-date').textContent =
+        now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+    updateSummary();
+    renderGrid();
+  </script>
 </body>
 </html>
