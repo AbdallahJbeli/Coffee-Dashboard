@@ -437,6 +437,7 @@
       document.getElementById('clock-date').textContent =
         now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
     }
+    // 
 
     updateClock();
     setInterval(updateClock, 1000);
