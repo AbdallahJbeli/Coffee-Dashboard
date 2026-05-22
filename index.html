@@ -1,36 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coffee Dashboard</title>
+  <title>Café Manager</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&display=swap" rel="stylesheet" />
 
-  <!-- SheetJS for Excel export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- jsPDF for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- jsPDF AutoTable plugin -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #e8e0d0;
-      --surface:    #1e1408;
-      --surface-2:  #2a1c10;
-      --border:     #3a2818;
-      --accent:     #c8732a;
-      --warn:       #e03020;
-      --warn-bg:    #2e1008;
-      --warn-bd:    #6a1e14;
-      --ok:         #4ab85a;
-      --ok-bg:      #0e2212;
-      --text:       #f8f0e4;
-      --text-2:     #c09a7a;
-      --text-3:     #7a6050;
+      --bg:      #e8e0d0;
+      --surface: #1e1408;
+      --border:  #3a2818;
+      --accent:  #c8732a;
+      --warn:    #e03020;
+      --warn-bg: #2e1008;
+      --warn-bd: #6a1e14;
+      --ok:      #4ab85a;
+      --ok-bg:   #0e2212;
+      --text:    #f8f0e4;
+      --text-2:  #e0c8a8;
+      --text-3:  #b89878;
     }
 
     body {
@@ -41,6 +36,7 @@
       padding: 40px 24px 60px;
     }
 
+    /* ── HEADER ── */
     header {
       max-width: 1320px;
       margin: 0 auto 36px;
@@ -52,240 +48,151 @@
       border-bottom: 1.5px solid #b09870;
       padding-bottom: 24px;
     }
-
-    .logo-block h1 {
-      font-family: 'Fraunces', serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      color: var(--accent);
-      line-height: 1;
-    }
-
-    .logo-block p {
-      font-size: 12px;
-      color: #7a6050;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      margin-top: 6px;
-    }
-
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 14px;
-    }
-
-    .clock {
-      font-family: 'DM Mono', monospace;
-      font-size: 14px;
-      color: #6b5030;
-      text-align: right;
-      line-height: 1.6;
-    }
-
-    .clock strong {
-      display: block;
-      font-size: 24px;
-      color: #2a1f14;
-      letter-spacing: -0.02em;
-    }
-
-    .btn-report {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-    }
-    .btn-report:hover  { background: #a05820; }
-    .btn-report:active { transform: scale(0.97); }
+    .logo-block h1 { font-family:'Fraunces',serif; font-size:clamp(2rem,5vw,3.2rem); font-weight:700; letter-spacing:-0.02em; color:var(--accent); line-height:1; }
+    .logo-block p  { font-size:12px; color:#7a6050; letter-spacing:0.12em; text-transform:uppercase; margin-top:6px; }
+    .header-right  { display:flex; flex-direction:column; align-items:flex-end; gap:14px; }
+    .clock         { font-family:'DM Mono',monospace; font-size:14px; color:#6b5030; text-align:right; line-height:1.6; }
+    .clock strong  { display:block; font-size:24px; color:#2a1f14; letter-spacing:-0.02em; }
+    .btn-report    { display:flex; align-items:center; gap:8px; padding:10px 20px; background:var(--accent); color:#fff; border:none; border-radius:10px; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background 0.2s,transform 0.1s; }
+    .btn-report:hover  { background:#a05820; }
+    .btn-report:active { transform:scale(0.97); }
     .btn-report svg { width:16px; height:16px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
 
-    /* SUMMARY */
-    .summary {
-      max-width: 1320px;
-      margin: 0 auto 32px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .stat {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
+    /* ── SUMMARY ── */
+    .summary { max-width:1320px; margin:0 auto 32px; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .stat { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px 24px; display:flex; flex-direction:column; gap:4px; }
     .stat-label { font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-2); }
     .stat-val   { font-family:'Fraunces',serif; font-size:42px; font-weight:700; line-height:1; color:var(--text); }
     .stat-val.red   { color:#ff5040; }
     .stat-val.green { color:var(--ok); }
 
-    /* GRID */
-    .grid {
-      max-width: 1320px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 14px;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: transform 0.25s, box-shadow 0.25s, background 0.3s, border 0.3s;
-      animation: fadeIn 0.35s ease both;
-      color: var(--text);
-      font-size: 14px;
-    }
-
-    @keyframes fadeIn {
-      from { opacity:0; transform:translateY(8px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    .card:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(0,0,0,0.5); }
+    /* ── GRID ── */
+    .grid { max-width:1320px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:22px 24px 20px; display:flex; flex-direction:column; gap:14px; transition:transform 0.25s,box-shadow 0.25s,background 0.3s,border 0.3s; animation:fadeIn 0.35s ease both; font-size:14px; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .card:hover   { transform:translateY(-2px); box-shadow:0 10px 32px rgba(0,0,0,0.5); }
     .card.calling { border:1.5px solid var(--warn-bd); background:var(--warn-bg); }
-
-    .card-top { display:flex; justify-content:space-between; align-items:flex-start; }
-    .table-label { font-size:13px; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-3); }
-    .table-num { font-family:'Fraunces',serif; font-size:40px; font-weight:700; color:var(--text); line-height:1; }
-
-    .batt-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
-    .batt-shell { width:50px; height:20px; border:1.5px solid var(--border); border-radius:5px; position:relative; padding:2px; }
+    .card-top     { display:flex; justify-content:space-between; align-items:flex-start; }
+    .table-label  { font-size:13px; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-3); }
+    .table-num    { font-family:'Fraunces',serif; font-size:40px; font-weight:700; color:var(--text); line-height:1; }
+    .batt-wrap    { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+    .batt-shell   { width:50px; height:20px; border:1.5px solid var(--border); border-radius:5px; position:relative; padding:2px; }
     .batt-shell::after { content:''; position:absolute; right:-5px; top:50%; transform:translateY(-50%); width:4px; height:10px; background:var(--border); border-radius:0 2px 2px 0; }
-    .batt-fill { height:100%; border-radius:3px; transition:width 0.4s ease; }
-    .batt-pct { font-size:14px; color:var(--text); letter-spacing:0.04em; font-weight:600; }
-
-    .card-meta { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; min-height:46px; }
-    .card-icon { font-size:42px; line-height:1; display:flex; align-items:center; flex:0 0 auto; }
-    .card-alert { display:flex; align-items:center; justify-content:flex-end; min-width:0; flex:1 1 auto; }
+    .batt-fill    { height:100%; border-radius:3px; transition:width 0.4s ease; }
+    .batt-pct     { font-size:14px; color:var(--text); letter-spacing:0.04em; font-weight:600; }
+    .card-meta    { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; min-height:46px; }
+    .card-icon    { font-size:42px; line-height:1; display:flex; align-items:center; flex:0 0 auto; }
+    .card-alert   { display:flex; align-items:center; justify-content:flex-end; min-width:0; flex:1 1 auto; }
     .card-alert-dot { width:18px; height:18px; border-radius:50%; background:var(--warn); flex-shrink:0; animation:pulse 1s infinite; }
-
-    .divider { height:1px; background:var(--border); }
+    .divider      { height:1px; background:var(--border); }
     .card.calling .divider { background:var(--warn-bd); }
-
-    .status { display:flex; align-items:center; gap:9px; padding:10px 13px; border-radius:10px; background:var(--ok-bg); }
-    .card.calling .status { display:none; }
+    .status       { display:flex; align-items:center; gap:9px; padding:10px 13px; border-radius:10px; background:var(--ok-bg); }
+    .card.calling .status      { display:none; }
     .card:not(.calling) .card-alert { display:none; }
-    .dot { width:10px; height:10px; border-radius:50%; background:var(--ok); flex-shrink:0; }
-    .status-text { font-size:14px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text); font-weight:500; }
-
-    @keyframes pulse {
-      0%   { box-shadow:0 0 0 0 rgba(224,48,32,0.8); }
-      70%  { box-shadow:0 0 0 12px rgba(224,48,32,0); }
-      100% { box-shadow:0 0 0 0 rgba(224,48,32,0); }
-    }
-
-    .btn-confirm { display:none; width:100%; padding:14px; border:none; border-radius:10px; background:var(--warn); color:#fff; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background 0.2s, transform 0.1s; }
+    .dot          { width:10px; height:10px; border-radius:50%; background:var(--ok); flex-shrink:0; }
+    .status-text  { font-size:14px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text); font-weight:500; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(224,48,32,0.8)} 70%{box-shadow:0 0 0 12px rgba(224,48,32,0)} 100%{box-shadow:0 0 0 0 rgba(224,48,32,0)} }
+    .btn-confirm  { display:none; width:100%; padding:14px; border:none; border-radius:10px; background:var(--warn); color:#fff; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background 0.2s,transform 0.1s; }
     .card.calling .btn-confirm { display:block; }
     .btn-confirm:hover  { background:#b01e10; }
     .btn-confirm:active { transform:scale(0.98); }
 
-    /* MODAL */
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(10,6,2,0.82); z-index:1000; align-items:center; justify-content:center; padding:20px; }
+    /* ══════════════════════════════
+       MODAL
+    ══════════════════════════════ */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(6,3,1,0.88); z-index:1000; align-items:center; justify-content:center; padding:20px; }
     .modal-overlay.open { display:flex; }
+    .modal { background:#0f0a04; border:1px solid #5a3820; border-radius:22px; width:100%; max-width:780px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; animation:modalIn 0.25s ease both; }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.96) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
 
-    .modal { background:#1a1008; border:1px solid #4a3020; border-radius:22px; width:100%; max-width:780px; max-height:88vh; display:flex; flex-direction:column; overflow:hidden; animation:modalIn 0.25s ease both; }
-
-    @keyframes modalIn {
-      from { opacity:0; transform:scale(0.96) translateY(12px); }
-      to   { opacity:1; transform:scale(1) translateY(0); }
-    }
-
-    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:24px 28px 20px; border-bottom:1px solid #3a2818; flex-shrink:0; }
-    .modal-header h2 { font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:var(--accent); }
-    .modal-header p  { font-size:12px; color:var(--text-3); margin-top:3px; text-transform:uppercase; letter-spacing:0.1em; }
-
-    .modal-close { width:36px; height:36px; border-radius:50%; border:1px solid #3a2818; background:transparent; color:var(--text-2); font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; transition:background 0.2s, color 0.2s; flex-shrink:0; }
+    /* modal header */
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:24px 28px 20px; border-bottom:1px solid #5a3820; flex-shrink:0; }
+    .modal-header h2 { font-family:'Fraunces',serif; font-size:24px; font-weight:700; color:var(--accent); }
+    .modal-header p  { font-size:12px; color:#ffffff; margin-top:4px; text-transform:uppercase; letter-spacing:0.12em; }
+    .modal-close { width:36px; height:36px; border-radius:50%; border:1px solid #5a3820; background:transparent; color:#ffffff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s,color 0.2s; flex-shrink:0; }
     .modal-close:hover { background:var(--warn-bg); color:var(--warn); }
 
-    .tab-bar { display:flex; gap:0; padding:16px 28px 0; border-bottom:1px solid #3a2818; flex-shrink:0; overflow-x:auto; }
-    .tab-btn { padding:8px 18px 12px; border:none; background:transparent; color:var(--text-3); font-family:'DM Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.1em; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; transition:color 0.2s, border-color 0.2s; }
-    .tab-btn:hover  { color:var(--text-2); }
-    .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+    /* date picker */
+    .date-picker { display:flex; align-items:center; gap:10px; padding:14px 28px; border-bottom:1px solid #5a3820; flex-shrink:0; }
+    .date-picker label  { font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:#ffffff; font-weight:500; }
+    .date-picker select { background:#1a1008; border:1px solid #5a3820; color:#ffffff; font-family:'DM Mono',monospace; font-size:12px; padding:7px 12px; border-radius:8px; cursor:pointer; outline:none; }
+    .date-picker select:focus { border-color:var(--accent); }
+    .date-picker select option { background:#1a1008; color:#ffffff; }
 
+    /* tab bar */
+    .tab-bar { display:flex; padding:14px 28px 0; border-bottom:1px solid #5a3820; flex-shrink:0; overflow-x:auto; }
+    .tab-btn { padding:8px 20px 13px; border:none; background:transparent; color:#d4b896; font-family:'DM Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.12em; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; transition:color 0.2s,border-color 0.2s; }
+    .tab-btn:hover  { color:#ffffff; }
+    .tab-btn.active { color:#ffffff; border-bottom-color:var(--accent); }
+
+    /* modal body */
     .modal-body { overflow-y:auto; padding:24px 28px; flex:1; }
-    .modal-body::-webkit-scrollbar { width:6px; }
+    .modal-body::-webkit-scrollbar { width:5px; }
     .modal-body::-webkit-scrollbar-track { background:transparent; }
-    .modal-body::-webkit-scrollbar-thumb { background:#3a2818; border-radius:3px; }
+    .modal-body::-webkit-scrollbar-thumb { background:#5a3820; border-radius:3px; }
 
-    /* REPORT STATS */
+    /* ── KPI CARDS ── */
     .report-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:24px; }
-    .r-stat { background:#241608; border:1px solid #3a2818; border-radius:12px; padding:14px 16px; }
-    .r-stat-label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); margin-bottom:4px; }
-    .r-stat-val { font-family:'Fraunces',serif; font-size:28px; font-weight:700; color:var(--text); line-height:1; }
-    .r-stat-val.orange { color:var(--accent); }
-    .r-stat-val.red    { color:#ff5040; }
-    .r-stat-val.green  { color:var(--ok); }
+    .r-stat { background:#1a1008; border:1px solid #5a3820; border-radius:12px; padding:16px; }
+    .r-stat-label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:#ffffff; margin-bottom:8px; opacity:0.7; }
+    .r-stat-val   { font-family:'Fraunces',serif; font-size:30px; font-weight:700; color:#ffffff; line-height:1; }
+    .r-stat-val.orange { color:#e8923a; }
+    .r-stat-val.red    { color:#ff6050; }
+    .r-stat-val.green  { color:#5ad86a; }
 
-    /* TABLE */
+    /* ── REPORT TABLE ── */
     .report-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .report-table th { text-align:left; padding:8px 12px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-3); border-bottom:1px solid #3a2818; }
+    .report-table th {
+      text-align:left;
+      padding:11px 16px;
+      font-size:11px;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      color:#ffffff;
+      border-bottom:2px solid #5a3820;
+      background:#1a1008;
+    }
     .report-table th:not(:first-child) { text-align:center; }
-    .report-table td { padding:11px 12px; border-bottom:1px solid #2a1c10; color:var(--text); vertical-align:middle; }
+    .report-table td {
+      padding:13px 16px;
+      border-bottom:1px solid #2e1c0e;
+      color:#ffffff;
+      vertical-align:middle;
+    }
     .report-table td:not(:first-child) { text-align:center; }
     .report-table tr:last-child td { border-bottom:none; }
-    .report-table tr:hover td { background:#241608; }
-    .td-table-num { font-family:'Fraunces',serif; font-size:20px; font-weight:700; color:var(--text); }
+    .report-table tr:hover td { background:#1a1008; }
+    .td-table-num { font-family:'Fraunces',serif; font-size:22px; font-weight:700; color:#ffffff; }
 
-    .pill { display:inline-block; padding:2px 10px; border-radius:20px; font-size:11px; letter-spacing:0.08em; }
-    .pill-red    { background:#2e1008; color:#ff6050; border:1px solid #6a1e14; }
-    .pill-green  { background:#0e2212; color:#4ab85a; border:1px solid #1a4a24; }
+    .pill { display:inline-block; padding:4px 12px; border-radius:20px; font-size:11px; letter-spacing:0.08em; font-weight:600; }
+    .pill-red   { background:#3a1008; color:#ff8070; border:1px solid #8a2e14; }
+    .pill-green { background:#0e2212; color:#5ad86a; border:1px solid #1e6a2a; }
 
-    /* TIMELINE */
-    .timeline { display:flex; flex-direction:column; gap:0; }
-    .tl-item { display:flex; gap:16px; padding:14px 0; border-bottom:1px solid #2a1c10; align-items:flex-start; }
+    /* ── TIMELINE ── */
+    .timeline { display:flex; flex-direction:column; }
+    .tl-item  { display:flex; gap:16px; padding:15px 0; border-bottom:1px solid #2e1c0e; align-items:flex-start; }
     .tl-item:last-child { border-bottom:none; }
-    .tl-time { font-size:12px; color:var(--text-3); white-space:nowrap; min-width:72px; padding-top:2px; }
-    .tl-dot  { width:10px; height:10px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:4px; }
-    .tl-content { flex:1; }
-    .tl-title { font-size:13px; color:var(--text); margin-bottom:2px; }
-    .tl-sub   { font-size:12px; color:var(--text-3); }
+    .tl-time    { font-size:12px; color:#ffffff; white-space:nowrap; min-width:76px; padding-top:2px; opacity:0.7; }
+    .tl-dot     { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+    .tl-title   { font-size:13px; color:#ffffff; margin-bottom:3px; font-weight:500; }
+    .tl-sub     { font-size:12px; color:#ffffff; opacity:0.65; }
 
-    /* EMPTY */
-    .empty-state { text-align:center; padding:50px 20px; color:var(--text-3); }
-    .empty-state .es-icon { font-size:48px; margin-bottom:16px; opacity:0.4; }
-    .empty-state p { font-size:14px; letter-spacing:0.05em; }
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align:center; padding:50px 20px; }
+    .empty-state .es-icon { font-size:48px; margin-bottom:16px; opacity:0.35; }
+    .empty-state p { font-size:14px; color:#ffffff; opacity:0.6; line-height:1.8; }
 
-    /* MODAL FOOTER */
-    .modal-footer { display:flex; align-items:center; justify-content:space-between; padding:16px 28px; border-top:1px solid #3a2818; flex-shrink:0; gap:12px; flex-wrap:wrap; }
-    .modal-footer p { font-size:11px; color:var(--text-3); letter-spacing:0.06em; }
+    /* ── BAR CHART ── */
+    .chart-container { margin-top:4px; background:#1a1008; border:1px solid #5a3820; border-radius:12px; padding:18px 14px 12px; }
+    .chart-label { font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:#ffffff; opacity:0.7; margin-bottom:16px; }
 
-    .export-group { display:flex; gap:8px; }
-
-    .btn-export { display:flex; align-items:center; gap:7px; padding:9px 16px; background:transparent; border:1px solid #4a3020; border-radius:9px; color:var(--text-2); font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:background 0.2s, color 0.2s, border-color 0.2s; }
-    .btn-export:hover { background:#2a1c10; color:var(--text); border-color:#6a4830; }
-    .btn-export.excel:hover { border-color:#1a6a2a; color:#4ab85a; }
-    .btn-export.pdf:hover   { border-color:#8a1e14; color:#ff6050; }
-    .btn-export svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-
-    /* DATE PICKER */
-    .date-picker { display:flex; align-items:center; gap:8px; padding:16px 28px; border-bottom:1px solid #3a2818; flex-shrink:0; }
-    .date-picker label { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-3); }
-    .date-picker select { background:#241608; border:1px solid #3a2818; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; padding:6px 10px; border-radius:7px; cursor:pointer; outline:none; }
-    .date-picker select:focus { border-color:var(--accent); }
+    /* ── MODAL FOOTER ── */
+    .modal-footer { display:flex; align-items:center; justify-content:space-between; padding:16px 28px; border-top:1px solid #5a3820; flex-shrink:0; gap:12px; flex-wrap:wrap; }
+    .modal-footer p { font-size:11px; color:#ffffff; letter-spacing:0.08em; opacity:0.7; }
+    .btn-export-pdf { display:flex; align-items:center; gap:8px; padding:10px 20px; background:transparent; border:1.5px solid #8a3e20; border-radius:9px; color:#ff9070; font-family:'DM Mono',monospace; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:background 0.2s,color 0.2s,border-color 0.2s; }
+    .btn-export-pdf:hover  { background:#2e1008; color:#ffb090; border-color:#b05030; }
+    .btn-export-pdf:active { transform:scale(0.97); }
+    .btn-export-pdf svg { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
     @media (max-width:600px) {
       header { flex-direction:column; align-items:flex-start; }
@@ -293,12 +200,8 @@
       .clock { text-align:left; }
       .summary { grid-template-columns:1fr 1fr; }
       .report-stats { grid-template-columns:repeat(2,1fr); }
-      .modal-header { padding:18px 18px 14px; }
-      .tab-bar { padding:12px 18px 0; }
-      .modal-body { padding:18px; }
-      .modal-footer { padding:12px 18px; }
-      .date-picker { padding:12px 18px; }
-      .export-group { flex-wrap:wrap; }
+      .modal-header { padding:18px; }
+      .tab-bar, .date-picker, .modal-body, .modal-footer { padding-left:18px; padding-right:18px; }
     }
   </style>
 </head>
@@ -307,33 +210,33 @@
   <header>
     <div class="logo-block">
       <h1>Café Manager</h1>
-      <p>Table call system · Live view</p>
+      <p>Système d'appel de table · Vue en direct</p>
     </div>
     <div class="header-right">
       <div class="clock">
         <strong id="clock-time">--:--</strong>
-        <span id="clock-date">Loading…</span>
+        <span id="clock-date">Chargement…</span>
       </div>
       <button class="btn-report" onclick="openReport()">
         <svg viewBox="0 0 24 24"><path d="M9 17H7a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v1"/><rect x="9" y="11" width="13" height="10" rx="2"/><path d="M13 15h5M13 18h3"/></svg>
-        Daily Report
+        Rapport du jour
       </button>
     </div>
   </header>
 
   <div class="summary" id="summary"></div>
-  <div class="grid" id="grid"></div>
+  <div class="grid"    id="grid"></div>
 
-  <!-- MODAL -->
+  <!-- ══ MODAL ══ -->
   <div class="modal-overlay" id="modal-overlay" onclick="overlayClick(event)">
     <div class="modal">
 
       <div class="modal-header">
         <div>
-          <h2>Daily Report</h2>
-          <p id="modal-subtitle">Loading…</p>
+          <h2>Rapport journalier</h2>
+          <p id="modal-subtitle">Chargement…</p>
         </div>
-        <button class="modal-close" onclick="closeReport()" aria-label="Close">×</button>
+        <button class="modal-close" onclick="closeReport()" aria-label="Fermer">×</button>
       </div>
 
       <div class="date-picker">
@@ -342,32 +245,26 @@
       </div>
 
       <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('summary',this)">Summary</button>
-        <button class="tab-btn"        onclick="switchTab('tables',this)">By table</button>
-        <button class="tab-btn"        onclick="switchTab('timeline',this)">Timeline</button>
+        <button class="tab-btn active" onclick="switchTab('summary',this)">Résumé</button>
+        <button class="tab-btn"        onclick="switchTab('tables',this)">Par table</button>
+        <button class="tab-btn"        onclick="switchTab('timeline',this)">Chronologie</button>
       </div>
 
       <div class="modal-body" id="modal-body"></div>
 
       <div class="modal-footer">
         <p id="modal-footer-info">—</p>
-        <div class="export-group">
-          <button class="btn-export excel" onclick="exportExcel()">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Export Excel
-          </button>
-          <button class="btn-export pdf" onclick="exportPDF()">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="18" x2="13" y2="18"/></svg>
-            Export PDF
-          </button>
-        </div>
+        <button class="btn-export-pdf" onclick="exportPDF()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="18" x2="13" y2="18"/></svg>
+          Exporter PDF
+        </button>
       </div>
 
     </div>
   </div>
 
   <script>
-    /* ─── DATA ─── */
+    /* ── DONNÉES ── */
     const tables = [
       { id:"01", batt:88, waiting:true,  icon:"☕" },
       { id:"02", batt:72, waiting:true,  icon:"☕" },
@@ -383,56 +280,48 @@
       { id:"12", batt:67, waiting:false, icon:"☕" }
     ];
 
-    /* ─── LOG ─── */
+    /* ── LOG ── */
     const LOG_KEY = 'cafe_log_v1';
-
     function todayKey() { return new Date().toISOString().slice(0,10); }
+    function loadLog()  { try { return JSON.parse(localStorage.getItem(LOG_KEY)||'{}'); } catch(e){ return {}; } }
+    function saveLog(l) { localStorage.setItem(LOG_KEY, JSON.stringify(l)); }
 
-    function loadLog() {
-      try { return JSON.parse(localStorage.getItem(LOG_KEY) || '{}'); }
-      catch(e) { return {}; }
-    }
-
-    function saveLog(log) { localStorage.setItem(LOG_KEY, JSON.stringify(log)); }
-
-    function logEvent(tableId, battLevel, status) {
-      const log = loadLog();
-      const day = todayKey();
+    function logEvent(tableId, batt, status) {
+      const log = loadLog(), day = todayKey();
       if (!log[day]) log[day] = { events:[] };
-      const entry = { table:tableId, batt:battLevel, status };
-      if (status === 'dismissed') entry.dismissedAt = new Date().toISOString();
-      else                         entry.calledAt    = new Date().toISOString();
-      log[day].events.push(entry);
+      const e = { table:tableId, batt, status };
+      e[status==='dismissed' ? 'dismissedAt' : 'calledAt'] = new Date().toISOString();
+      log[day].events.push(e);
       saveLog(log);
     }
 
-    /* ─── BATTERY ─── */
+    /* ── BATTERIE ── */
     function battColor(p) {
       if (p < 20) return '#e03020';
       if (p < 40) return '#d08020';
       return '#4ab85a';
     }
 
-    /* ─── SUMMARY BAR ─── */
+    /* ── RÉSUMÉ HAUT ── */
     function updateSummary() {
-      const calling = tables.filter(t => t.waiting).length;
-      const lowBatt = tables.filter(t => t.batt < 20).length;
+      const calling = tables.filter(t=>t.waiting).length;
+      const lowBatt = tables.filter(t=>t.batt<20).length;
       const ready   = tables.length - calling;
       document.getElementById('summary').innerHTML = `
-        <div class="stat"><span class="stat-label">Calling</span><span class="stat-val ${calling>0?'red':'green'}">${calling}</span></div>
-        <div class="stat"><span class="stat-label">Low battery</span><span class="stat-val ${lowBatt>0?'red':''}">${lowBatt}</span></div>
-        <div class="stat"><span class="stat-label">Ready</span><span class="stat-val green">${ready}</span></div>
+        <div class="stat"><span class="stat-label">En appel</span><span class="stat-val ${calling>0?'red':'green'}">${calling}</span></div>
+        <div class="stat"><span class="stat-label">Batterie faible</span><span class="stat-val ${lowBatt>0?'red':''}">${lowBatt}</span></div>
+        <div class="stat"><span class="stat-label">Disponible</span><span class="stat-val green">${ready}</span></div>
       `;
     }
 
-    /* ─── GRID ─── */
+    /* ── GRILLE ── */
     function renderGrid() {
       const grid = document.getElementById('grid');
       grid.innerHTML = '';
       tables.forEach((t,i) => {
         const card = document.createElement('div');
-        card.className = 'card' + (t.waiting ? ' calling' : '');
-        card.id = 'card-' + t.id;
+        card.className = 'card'+(t.waiting?' calling':'');
+        card.id = 'card-'+t.id;
         card.style.animationDelay = (i*0.04)+'s';
         card.innerHTML = `
           <div class="card-top">
@@ -447,102 +336,94 @@
             <div class="card-alert"><span class="card-alert-dot"></span></div>
           </div>
           <div class="divider"></div>
-          <div class="status"><div class="dot"></div><span class="status-text">Ready</span></div>
-          <button type="button" class="btn-confirm" onclick="dismiss(event,'${t.id}')">Confirm receipt</button>
+          <div class="status"><div class="dot"></div><span class="status-text">Disponible</span></div>
+          <button type="button" class="btn-confirm" onclick="dismiss(event,'${t.id}')">Confirmer la réception</button>
         `;
         grid.appendChild(card);
       });
     }
 
-    /* ─── DISMISS ─── */
+    /* ── CONFIRMER ── */
     function dismiss(event, id) {
       event.preventDefault();
-      const idx = tables.findIndex(t => t.id === id);
+      const idx = tables.findIndex(t=>t.id===id);
       if (idx > -1) {
         logEvent(id, tables[idx].batt, 'dismissed');
         tables[idx].waiting = false;
-        const card = document.getElementById('card-'+id);
-        if (card) card.classList.remove('calling');
+        document.getElementById('card-'+id)?.classList.remove('calling');
         updateSummary();
       }
     }
 
-    /* ─── CLOCK ─── */
+    /* ── HORLOGE ── */
     function updateClock() {
       const now = new Date();
       document.getElementById('clock-time').textContent =
-        now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
       document.getElementById('clock-date').textContent =
-        now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+        now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
     }
 
-    /* ─── MODAL STATE ─── */
-    let activeTab    = 'summary';
-    let selectedDate = todayKey();
+    /* ── MODAL STATE ── */
+    let activeTab = 'summary', selectedDate = todayKey();
 
     function openReport() {
-      activeTab    = 'summary';
-      selectedDate = todayKey();
-      document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
-      populateDateSelect();
-      renderModal();
+      activeTab = 'summary'; selectedDate = todayKey();
+      document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+      populateDateSelect(); renderModal();
       document.getElementById('modal-overlay').classList.add('open');
     }
-
     function closeReport() { document.getElementById('modal-overlay').classList.remove('open'); }
     function overlayClick(e) { if (e.target===document.getElementById('modal-overlay')) closeReport(); }
-
-    function switchTab(tab, btn) {
+    function switchTab(tab,btn) {
       activeTab = tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       renderModal();
     }
-
     function onDateChange() { selectedDate = document.getElementById('date-select').value; renderModal(); }
 
-    /* ─── DATE SELECT ─── */
+    /* ── DATE SELECT ── */
     function populateDateSelect() {
-      const log   = loadLog();
-      const days  = Object.keys(log).sort().reverse();
-      const today = todayKey();
-      const all   = days.includes(today) ? days : [today,...days];
-      const sel   = document.getElementById('date-select');
+      const log = loadLog(), days = Object.keys(log).sort().reverse(), today = todayKey();
+      const all = days.includes(today) ? days : [today,...days];
+      const sel = document.getElementById('date-select');
       sel.innerHTML = '';
       all.forEach(d => {
         const opt = document.createElement('option');
-        opt.value = d;
-        opt.textContent = formatDateLabel(d);
-        if (d === selectedDate) opt.selected = true;
+        opt.value = d; opt.textContent = formatDateLabel(d);
+        if (d===selectedDate) opt.selected = true;
         sel.appendChild(opt);
       });
     }
 
     function formatDateLabel(ds) {
-      const d    = new Date(ds+'T12:00:00');
-      const today = todayKey();
-      const yest  = new Date(); yest.setDate(yest.getDate()-1);
-      const yKey  = yest.toISOString().slice(0,10);
-      if (ds===today) return 'Today · '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-      if (ds===yKey)  return 'Yesterday · '+d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
-      return d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+      const d = new Date(ds+'T12:00:00'), today = todayKey();
+      const yest = new Date(); yest.setDate(yest.getDate()-1);
+      const yKey = yest.toISOString().slice(0,10);
+      if (ds===today) return "Aujourd'hui · "+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+      if (ds===yKey)  return 'Hier · '+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+      return d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
     }
 
-    /* ─── RENDER MODAL ─── */
+    /* ── RENDER MODAL ── */
     function renderModal() {
-      const log      = loadLog();
-      const events   = (log[selectedDate]||{events:[]}).events;
+      const log = loadLog();
+      const events = (log[selectedDate]||{events:[]}).events;
       const dismissed = events.filter(e=>e.status==='dismissed');
-      document.getElementById('modal-subtitle').textContent = formatDateLabel(selectedDate).replace(' · ',' – ');
+      document.getElementById('modal-subtitle').textContent =
+        formatDateLabel(selectedDate).replace(' · ',' – ').toUpperCase();
       document.getElementById('modal-footer-info').textContent =
-        events.length===0 ? 'No events logged for this day' : `${events.length} event${events.length!==1?'s':''} logged`;
+        events.length===0
+          ? 'Aucun événement enregistré pour ce jour'
+          : `${events.length} événement${events.length>1?'s':''} enregistré${events.length>1?'s':''}`;
       const body = document.getElementById('modal-body');
       if (activeTab==='summary')  body.innerHTML = renderSummaryTab(events,dismissed);
       if (activeTab==='tables')   body.innerHTML = renderTablesTab(events);
       if (activeTab==='timeline') body.innerHTML = renderTimelineTab(events);
     }
 
-    /* ─── SUMMARY TAB ─── */
+    /* ── ONGLET RÉSUMÉ ── */
     function renderSummaryTab(events, dismissed) {
       if (!events.length) return emptyState();
       const uniqTables = [...new Set(dismissed.map(e=>e.table))].length;
@@ -553,20 +434,31 @@
         const h  = new Date(ts).getHours();
         peakMap[h] = (peakMap[h]||0)+1;
       });
-      let peakHour = '—';
+      let heurePointe = '—';
       if (Object.keys(peakMap).length) {
         const top = Object.entries(peakMap).sort((a,b)=>b[1]-a[1])[0][0];
-        peakHour  = String(top).padStart(2,'0')+':00';
+        heurePointe = String(top).padStart(2,'0')+'h00';
       }
       return `
         <div class="report-stats">
-          <div class="r-stat"><div class="r-stat-label">Calls handled</div><div class="r-stat-val orange">${dismissed.length}</div></div>
-          <div class="r-stat"><div class="r-stat-label">Tables served</div><div class="r-stat-val">${uniqTables}</div></div>
-          <div class="r-stat"><div class="r-stat-label">Low batt alerts</div><div class="r-stat-val ${lowBatt>0?'red':'green'}">${lowBatt}</div></div>
-          <div class="r-stat"><div class="r-stat-label">Peak hour</div><div class="r-stat-val" style="font-size:22px;padding-top:4px">${peakHour}</div></div>
+          <div class="r-stat">
+            <div class="r-stat-label">Appels traités</div>
+            <div class="r-stat-val orange">${dismissed.length}</div>
+          </div>
+          <div class="r-stat">
+            <div class="r-stat-label">Tables servies</div>
+            <div class="r-stat-val">${uniqTables}</div>
+          </div>
+          <div class="r-stat">
+            <div class="r-stat-label">Alerte batterie</div>
+            <div class="r-stat-val ${lowBatt>0?'red':'green'}">${lowBatt}</div>
+          </div>
+          <div class="r-stat">
+            <div class="r-stat-label">Heure de pointe</div>
+            <div class="r-stat-val" style="font-size:20px;padding-top:6px;">${heurePointe}</div>
+          </div>
         </div>
-        ${renderBarChart(buildHourlyData(events))}
-      `;
+        ${renderBarChart(buildHourlyData(events))}`;
     }
 
     function buildHourlyData(events) {
@@ -586,21 +478,21 @@
         const pct = Math.round((count/max)*100);
         return `
           <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;">
-            <span style="font-size:10px;color:var(--text-3);min-height:14px;">${count||''}</span>
-            <div style="width:100%;position:relative;height:80px;display:flex;align-items:flex-end;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.6);min-height:14px;">${count||''}</span>
+            <div style="width:100%;height:80px;display:flex;align-items:flex-end;">
               <div style="width:100%;height:${Math.max(pct,3)}%;background:${count>0?'var(--accent)':'#2a1c10'};border-radius:3px 3px 0 0;transition:height 0.3s;"></div>
             </div>
-            <span style="font-size:9px;color:var(--text-3);transform:rotate(-45deg);transform-origin:top left;margin-top:6px;white-space:nowrap;">${String(h).padStart(2,'0')}h</span>
+            <span style="font-size:9px;color:rgba(255,255,255,0.5);transform:rotate(-45deg);transform-origin:top left;margin-top:6px;white-space:nowrap;">${String(h).padStart(2,'0')}h</span>
           </div>`;
       }).join('');
       return `
-        <div style="margin-top:8px;background:#1a1008;border:1px solid #3a2818;border-radius:12px;padding:16px 14px 6px;">
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-3);margin-bottom:14px;">Calls per hour</div>
+        <div class="chart-container">
+          <div class="chart-label">Appels par heure</div>
           <div style="display:flex;gap:3px;align-items:flex-end;">${bars}</div>
         </div>`;
     }
 
-    /* ─── BY TABLE TAB ─── */
+    /* ── ONGLET PAR TABLE ── */
     function renderTablesTab(events) {
       if (!events.length) return emptyState();
       const map = {};
@@ -621,19 +513,32 @@
           const pill = d.lowBatt>0
             ? `<span class="pill pill-red">⚠ ${d.lowBatt}</span>`
             : `<span class="pill pill-green">OK</span>`;
-          return `<tr><td><span class="td-table-num">${id}</span></td><td>${total}</td><td>${d.dismissed}</td><td>${pill}</td><td style="color:var(--text-3);font-size:12px;">${d.lastSeen}</td></tr>`;
+          return `
+            <tr>
+              <td><span class="td-table-num">${id}</span></td>
+              <td>${total}</td>
+              <td>${d.dismissed}</td>
+              <td>${pill}</td>
+              <td style="color:rgba(255,255,255,0.65);font-size:12px;">${d.lastSeen}</td>
+            </tr>`;
         }).join('');
       return `
         <table class="report-table">
-          <thead><tr><th>Table</th><th>Calls</th><th>Handled</th><th>Battery</th><th>Last seen</th></tr></thead>
-          <tbody>${rows||'<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:30px;">No table activity yet.</td></tr>'}</tbody>
+          <thead>
+            <tr>
+              <th>Table</th><th>Appels</th><th>Traités</th><th>Batterie</th><th>Dernière vue</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows||'<tr><td colspan="5" style="text-align:center;color:rgba(255,255,255,0.4);padding:30px;">Aucune activité enregistrée.</td></tr>'}
+          </tbody>
         </table>`;
     }
 
-    /* ─── TIMELINE TAB ─── */
+    /* ── ONGLET CHRONOLOGIE ── */
     function renderTimelineTab(events) {
       if (!events.length) return emptyState();
-      const sorted = [...events].sort((a,b)=>{
+      const sorted = [...events].sort((a,b) => {
         const ta=a.dismissedAt||a.calledAt||'';
         const tb=b.dismissedAt||b.calledAt||'';
         return tb.localeCompare(ta);
@@ -646,8 +551,8 @@
             <span class="tl-time">${ts?formatTime(ts):'—'}</span>
             <div class="tl-dot" style="background:${isDone?'var(--ok)':'var(--warn)'}"></div>
             <div class="tl-content">
-              <div class="tl-title">${isDone?'Call handled':'Table called'}</div>
-              <div class="tl-sub">Table ${e.table} · Battery ${e.batt}%${e.batt<20?' ⚠':''}</div>
+              <div class="tl-title">${isDone?'Appel traité':'Appel entrant'}</div>
+              <div class="tl-sub">Table ${e.table} · Batterie ${e.batt}%${e.batt<20?' ⚠':''}</div>
             </div>
           </div>`;
       }).join('');
@@ -655,18 +560,20 @@
     }
 
     function emptyState() {
-      return `<div class="empty-state"><div class="es-icon">☕</div><p>No events logged for this day yet.<br>Calls confirmed here will appear in the report.</p></div>`;
+      return `
+        <div class="empty-state">
+          <div class="es-icon">☕</div>
+          <p>Aucun événement enregistré pour ce jour.<br>Les appels confirmés apparaîtront ici.</p>
+        </div>`;
     }
 
     function formatTime(iso) {
-      return new Date(iso).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      return new Date(iso).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     }
 
-    /* ─── COLLECT REPORT DATA ─── */
+    /* ── DONNÉES RAPPORT ── */
     function collectReportData() {
-      const log    = loadLog();
-      const events = (log[selectedDate]||{events:[]}).events;
-      return events;
+      return (loadLog()[selectedDate]||{events:[]}).events;
     }
 
     function buildTableStats(events) {
@@ -680,138 +587,32 @@
         if (e.batt<20) map[e.table].lowBatt++;
         if (ts) map[e.table].lastSeen = formatTime(ts);
       });
-      return Object.values(map).filter(r=>r.calls+r.dismissed>0)
+      return Object.values(map)
+        .filter(r=>r.calls+r.dismissed>0)
         .sort((a,b)=>(b.dismissed+b.calls)-(a.dismissed+a.calls));
     }
 
-    /* ════════════════════════════════════════
-       EXCEL EXPORT  (SheetJS)
-    ════════════════════════════════════════ */
-    function exportExcel() {
-      if (typeof XLSX === 'undefined') { alert('Excel library not loaded yet, please wait a moment and try again.'); return; }
-      const events = collectReportData();
-      if (!events.length) { alert('No events to export for this day.'); return; }
-
-      const wb = XLSX.utils.book_new();
-      const dateLabel = formatDateLabel(selectedDate);
-
-      /* ── Sheet 1: Summary ── */
-      const dismissed   = events.filter(e=>e.status==='dismissed');
-      const uniqTables  = [...new Set(dismissed.map(e=>e.table))].length;
-      const lowBattEvts = events.filter(e=>e.batt<20).length;
-      const peakMap     = {};
-      events.forEach(e => {
-        const ts = e.dismissedAt||e.calledAt; if(!ts) return;
-        const h  = new Date(ts).getHours();
-        peakMap[h] = (peakMap[h]||0)+1;
-      });
-      let peakHour = '—';
-      if (Object.keys(peakMap).length) {
-        const top = Object.entries(peakMap).sort((a,b)=>b[1]-a[1])[0][0];
-        peakHour  = String(top).padStart(2,'0')+':00';
-      }
-
-      const summaryData = [
-        ['Café Manager – Daily Report'],
-        ['Date', dateLabel],
-        ['Generated', new Date().toLocaleString('en-GB')],
-        [],
-        ['SUMMARY'],
-        ['Metric', 'Value'],
-        ['Total events logged', events.length],
-        ['Calls handled (dismissed)', dismissed.length],
-        ['Unique tables served', uniqTables],
-        ['Low battery alerts', lowBattEvts],
-        ['Peak hour', peakHour],
-        [],
-        ['CALLS PER HOUR'],
-        ['Hour', 'Call count'],
-        ...Object.entries(buildHourlyData(events)).map(([h,c])=>[String(h).padStart(2,'0')+':00', c])
-      ];
-
-      const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-      ws1['!cols'] = [{wch:30},{wch:20}];
-
-      /* style title */
-      if (ws1['A1']) {
-        ws1['A1'].s = { font:{bold:true, sz:14, color:{rgb:'C8732A'}}, alignment:{horizontal:'left'} };
-      }
-
-      XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
-
-      /* ── Sheet 2: By Table ── */
-      const tableStats = buildTableStats(events);
-      const tableData  = [
-        ['TABLE PERFORMANCE – '+dateLabel],
-        [],
-        ['Table', 'Total Calls', 'Handled', 'Pending', 'Low Batt Alerts', 'Last Seen'],
-        ...tableStats.map(r => [
-          'Table '+r.id,
-          r.calls+r.dismissed,
-          r.dismissed,
-          r.calls,
-          r.lowBatt,
-          r.lastSeen
-        ]),
-        [],
-        ['TOTALS'],
-        ['', tableStats.reduce((s,r)=>s+r.calls+r.dismissed,0),
-             tableStats.reduce((s,r)=>s+r.dismissed,0),
-             tableStats.reduce((s,r)=>s+r.calls,0),
-             tableStats.reduce((s,r)=>s+r.lowBatt,0), '']
-      ];
-      const ws2 = XLSX.utils.aoa_to_sheet(tableData);
-      ws2['!cols'] = [{wch:12},{wch:13},{wch:11},{wch:11},{wch:17},{wch:14}];
-      XLSX.utils.book_append_sheet(wb, ws2, 'By Table');
-
-      /* ── Sheet 3: Timeline ── */
-      const sorted = [...events].sort((a,b)=>{
-        const ta=a.dismissedAt||a.calledAt||'';
-        const tb=b.dismissedAt||b.calledAt||'';
-        return ta.localeCompare(tb);
-      });
-      const timelineData = [
-        ['TIMELINE – '+dateLabel],
-        [],
-        ['Time', 'Table', 'Event', 'Battery %', 'Battery Status'],
-        ...sorted.map(e => {
-          const ts = e.dismissedAt||e.calledAt;
-          return [
-            ts ? formatTime(ts) : '—',
-            'Table '+e.table,
-            e.status==='dismissed' ? 'Call handled' : 'Table called',
-            e.batt,
-            e.batt<20 ? 'LOW' : e.batt<40 ? 'Medium' : 'Good'
-          ];
-        })
-      ];
-      const ws3 = XLSX.utils.aoa_to_sheet(timelineData);
-      ws3['!cols'] = [{wch:12},{wch:10},{wch:16},{wch:13},{wch:16}];
-      XLSX.utils.book_append_sheet(wb, ws3, 'Timeline');
-
-      XLSX.writeFile(wb, `cafe-report-${selectedDate}.xlsx`);
-    }
-
-    /* ════════════════════════════════════════
-       PDF EXPORT  (jsPDF + AutoTable)
-    ════════════════════════════════════════ */
+    /* ════════════════════════════════════
+       EXPORT PDF
+    ════════════════════════════════════ */
     function exportPDF() {
-      if (typeof window.jspdf === 'undefined') { alert('PDF library not loaded yet, please wait a moment and try again.'); return; }
+      if (typeof window.jspdf==='undefined') {
+        alert("La bibliothèque PDF n'est pas encore chargée, veuillez réessayer."); return;
+      }
       const events = collectReportData();
-      if (!events.length) { alert('No events to export for this day.'); return; }
+      if (!events.length) { alert('Aucun événement à exporter pour ce jour.'); return; }
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
 
-      const BROWN   = [30, 20, 8];
-      const ACCENT  = [200, 115, 42];
-      const LIGHT   = [248, 240, 228];
-      const DARK    = [42, 28, 16];
-      const RED     = [224, 48, 32];
-      const GREEN   = [74, 184, 90];
-      const WHITE   = [255, 255, 255];
-      const W       = 210;
-      const MARGIN  = 14;
+      const BROWN  = [30, 20, 8];
+      const ACCENT = [200, 115, 42];
+      const LIGHT  = [248, 240, 228];
+      const MIDLIT = [220, 200, 170];
+      const DARK   = [42, 28, 16];
+      const RED    = [224, 48, 32];
+      const GREEN  = [74, 184, 90];
+      const W = 210, MARGIN = 14;
 
       const dismissed   = events.filter(e=>e.status==='dismissed');
       const uniqTables  = [...new Set(dismissed.map(e=>e.table))].length;
@@ -819,258 +620,192 @@
       const peakMap     = {};
       events.forEach(e => {
         const ts = e.dismissedAt||e.calledAt; if(!ts) return;
-        const h  = new Date(ts).getHours();
-        peakMap[h] = (peakMap[h]||0)+1;
+        peakMap[new Date(ts).getHours()] = (peakMap[new Date(ts).getHours()]||0)+1;
       });
-      let peakHour = '—';
+      let heurePointe = '—';
       if (Object.keys(peakMap).length) {
         const top = Object.entries(peakMap).sort((a,b)=>b[1]-a[1])[0][0];
-        peakHour  = String(top).padStart(2,'0')+':00';
+        heurePointe = String(top).padStart(2,'0')+'h00';
       }
 
-      /* ── helper: draw page header ── */
-      function pageHeader(pageLabel) {
-        doc.setFillColor(...BROWN);
-        doc.rect(0, 0, W, 22, 'F');
-        doc.setFillColor(...ACCENT);
-        doc.rect(0, 22, W, 2, 'F');
+      function pageHeader(label) {
+        doc.setFillColor(...BROWN); doc.rect(0,0,W,22,'F');
+        doc.setFillColor(...ACCENT); doc.rect(0,22,W,2.5,'F');
         doc.setTextColor(...LIGHT);
-        doc.setFontSize(16);
-        doc.setFont('helvetica','bold');
+        doc.setFontSize(16); doc.setFont('helvetica','bold');
         doc.text('Café Manager', MARGIN, 14);
-        doc.setFontSize(9);
-        doc.setFont('helvetica','normal');
-        doc.text(pageLabel, W-MARGIN, 14, {align:'right'});
+        doc.setFontSize(9); doc.setFont('helvetica','normal');
+        doc.text(label, W-MARGIN, 14, {align:'right'});
         return 32;
       }
 
-      /* ── helper: section title ── */
       function sectionTitle(y, title) {
-        doc.setFillColor(...DARK);
-        doc.rect(MARGIN, y, W-MARGIN*2, 7, 'F');
+        doc.setFillColor(...DARK); doc.rect(MARGIN,y,W-MARGIN*2,7.5,'F');
+        doc.setFillColor(...ACCENT); doc.rect(MARGIN,y,2.5,7.5,'F');
         doc.setTextColor(...ACCENT);
-        doc.setFontSize(9);
-        doc.setFont('helvetica','bold');
-        doc.text(title.toUpperCase(), MARGIN+3, y+5);
-        return y+12;
+        doc.setFontSize(9); doc.setFont('helvetica','bold');
+        doc.text(title, MARGIN+6, y+5.2);
+        return y+13;
       }
 
-      /* ─────────────────────────────────────
-         PAGE 1: SUMMARY
-      ───────────────────────────────────── */
-      let y = pageHeader('Daily Report – '+formatDateLabel(selectedDate));
+      /* PAGE 1 */
+      let y = pageHeader('Rapport journalier – '+formatDateLabel(selectedDate));
+      doc.setTextColor(140,100,60); doc.setFontSize(8); doc.setFont('helvetica','normal');
+      doc.text('Généré le : '+new Date().toLocaleString('fr-FR'), MARGIN, y);
+      y += 11;
 
-      /* Meta line */
-      doc.setTextColor(...BROWN);
-      doc.setFontSize(8);
-      doc.setFont('helvetica','normal');
-      doc.text('Generated: '+new Date().toLocaleString('en-GB'), MARGIN, y);
-      y += 10;
-
-      /* KPI cards */
-      y = sectionTitle(y, 'Summary');
+      y = sectionTitle(y, 'RÉSUMÉ');
       const kpis = [
-        { label:'Calls handled',    value:String(dismissed.length),  color:ACCENT },
-        { label:'Tables served',    value:String(uniqTables),         color:LIGHT  },
-        { label:'Low batt alerts',  value:String(lowBattEvts),        color:lowBattEvts>0?RED:GREEN },
-        { label:'Peak hour',        value:peakHour,                   color:LIGHT  }
+        { label:'Appels traités',   value:String(dismissed.length),  color:ACCENT },
+        { label:'Tables servies',   value:String(uniqTables),         color:LIGHT  },
+        { label:'Alertes batterie', value:String(lowBattEvts),        color:lowBattEvts>0?RED:GREEN },
+        { label:'Heure de pointe',  value:heurePointe,                color:LIGHT  }
       ];
       const cardW = (W-MARGIN*2-9)/4;
       kpis.forEach((k,i) => {
         const x = MARGIN + i*(cardW+3);
-        doc.setFillColor(...DARK);
-        doc.roundedRect(x, y, cardW, 18, 2, 2, 'F');
-        doc.setTextColor(...k.color);
-        doc.setFontSize(14);
-        doc.setFont('helvetica','bold');
-        doc.text(k.value, x+cardW/2, y+12, {align:'center'});
-        doc.setTextColor(120,90,60);
-        doc.setFontSize(7);
-        doc.setFont('helvetica','normal');
-        doc.text(k.label, x+cardW/2, y+17, {align:'center'});
+        doc.setFillColor(...DARK); doc.roundedRect(x,y,cardW,20,2,2,'F');
+        doc.setFillColor(...ACCENT); doc.rect(x,y,cardW,1.5,'F');
+        doc.setTextColor(...k.color); doc.setFontSize(15); doc.setFont('helvetica','bold');
+        doc.text(k.value, x+cardW/2, y+13, {align:'center'});
+        doc.setTextColor(160,120,70); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+        doc.text(k.label, x+cardW/2, y+18.5, {align:'center'});
       });
-      y += 26;
+      y += 28;
 
-      /* Hourly bar chart (text-based) */
-      y = sectionTitle(y, 'Calls per hour');
+      y = sectionTitle(y, 'APPELS PAR HEURE');
       const hourly = buildHourlyData(events);
-      const maxH   = Math.max(...Object.values(hourly),1);
-      const barMaxH= 28;
-      const barW   = (W-MARGIN*2-1) / Object.keys(hourly).length;
+      const maxH = Math.max(...Object.values(hourly),1);
+      const barMaxH = 30;
+      const barW = (W-MARGIN*2)/Object.keys(hourly).length;
+      doc.setFillColor(26,16,8); doc.roundedRect(MARGIN,y,W-MARGIN*2,barMaxH+10,2,2,'F');
       Object.entries(hourly).forEach(([h,count],i) => {
-        const x    = MARGIN + i*barW;
-        const bh   = count>0 ? Math.max((count/maxH)*barMaxH, 2) : 1;
-        const barY = y + barMaxH - bh;
-        doc.setFillColor(...(count>0?ACCENT:DARK));
-        doc.rect(x+0.5, barY, barW-1, bh, 'F');
+        const x  = MARGIN+i*barW;
+        const bh = count>0 ? Math.max((count/maxH)*barMaxH,2) : 1;
+        const by = y+barMaxH-bh+2;
+        doc.setFillColor(...(count>0?ACCENT:[42,28,16]));
+        doc.rect(x+1,by,barW-2,bh,'F');
         if (count>0) {
-          doc.setTextColor(...LIGHT);
-          doc.setFontSize(5.5);
-          doc.setFont('helvetica','bold');
-          doc.text(String(count), x+barW/2, barY-1, {align:'center'});
+          doc.setTextColor(...LIGHT); doc.setFontSize(5); doc.setFont('helvetica','bold');
+          doc.text(String(count), x+barW/2, by-1, {align:'center'});
         }
-        doc.setTextColor(120,90,60);
-        doc.setFontSize(5.5);
-        doc.setFont('helvetica','normal');
-        doc.text(String(h).padStart(2,'0'), x+barW/2, y+barMaxH+4, {align:'center'});
+        doc.setTextColor(160,120,70); doc.setFontSize(5); doc.setFont('helvetica','normal');
+        doc.text(String(h).padStart(2,'0'), x+barW/2, y+barMaxH+8, {align:'center'});
       });
-      y += barMaxH+10;
+      y += barMaxH+16;
 
-      /* ─────────────────────────────────────
-         TABLE PERFORMANCE TABLE
-      ───────────────────────────────────── */
-      y = sectionTitle(y, 'By table');
+      y = sectionTitle(y, 'PERFORMANCE PAR TABLE');
       const tableStats = buildTableStats(events);
       doc.autoTable({
-        startY: y,
-        margin: { left:MARGIN, right:MARGIN },
-        head: [['Table','Total Calls','Handled','Pending','Low Batt','Last Seen']],
-        body: tableStats.map(r => [
-          'Table '+r.id,
-          r.calls+r.dismissed,
-          r.dismissed,
-          r.calls,
-          r.lowBatt>0 ? '⚠ '+r.lowBatt : 'OK',
-          r.lastSeen
+        startY:y, margin:{left:MARGIN,right:MARGIN},
+        head:[['Table','Total appels','Traités','En attente','Alerte batt.','Dernière vue']],
+        body:tableStats.map(r=>[
+          'Table '+r.id, r.calls+r.dismissed, r.dismissed, r.calls,
+          r.lowBatt>0?'⚠ '+r.lowBatt:'OK', r.lastSeen
         ]),
-        foot: [['Totals',
+        foot:[['Totaux',
           tableStats.reduce((s,r)=>s+r.calls+r.dismissed,0),
           tableStats.reduce((s,r)=>s+r.dismissed,0),
           tableStats.reduce((s,r)=>s+r.calls,0),
-          tableStats.reduce((s,r)=>s+r.lowBatt,0),
-          ''
+          tableStats.reduce((s,r)=>s+r.lowBatt,0),''
         ]],
-        styles:         { fontSize:8, cellPadding:3, font:'helvetica', textColor:LIGHT, fillColor:BROWN },
-        headStyles:     { fillColor:DARK, textColor:ACCENT, fontStyle:'bold', fontSize:7.5 },
-        footStyles:     { fillColor:DARK, textColor:ACCENT, fontStyle:'bold' },
-        alternateRowStyles: { fillColor:[35,22,10] },
-        columnStyles: {
-          0:{fontStyle:'bold'},
-          1:{halign:'center'},
-          2:{halign:'center'},
-          3:{halign:'center'},
-          4:{halign:'center', textColor: undefined },
-          5:{halign:'center', fontSize:7}
-        },
-        didParseCell: (data) => {
-          if (data.section==='body' && data.column.index===4) {
-            const v = data.cell.raw;
-            data.cell.styles.textColor = (typeof v==='string'&&v.startsWith('⚠')) ? RED : GREEN;
+        styles:{fontSize:8,cellPadding:3.5,font:'helvetica',textColor:LIGHT,fillColor:BROWN},
+        headStyles:{fillColor:DARK,textColor:MIDLIT,fontStyle:'bold',fontSize:7.5},
+        footStyles:{fillColor:DARK,textColor:ACCENT,fontStyle:'bold'},
+        alternateRowStyles:{fillColor:[38,24,12]},
+        columnStyles:{0:{fontStyle:'bold'},1:{halign:'center'},2:{halign:'center'},3:{halign:'center'},4:{halign:'center'},5:{halign:'center',fontSize:7}},
+        didParseCell:(data)=>{
+          if (data.section==='body'&&data.column.index===4) {
+            data.cell.styles.textColor=(typeof data.cell.raw==='string'&&data.cell.raw.startsWith('⚠'))?RED:GREEN;
           }
         }
       });
-      y = doc.lastAutoTable.finalY + 8;
 
-      /* ─────────────────────────────────────
-         PAGE 2: TIMELINE
-      ───────────────────────────────────── */
+      /* PAGE 2 */
       doc.addPage();
-      y = pageHeader('Timeline – '+formatDateLabel(selectedDate));
-      y = sectionTitle(y, 'Event log');
-
+      y = pageHeader('Chronologie – '+formatDateLabel(selectedDate));
+      y = sectionTitle(y, 'JOURNAL DES ÉVÉNEMENTS');
       const sorted = [...events].sort((a,b)=>{
         const ta=a.dismissedAt||a.calledAt||'';
         const tb=b.dismissedAt||b.calledAt||'';
         return ta.localeCompare(tb);
       });
-
       doc.autoTable({
-        startY: y,
-        margin: { left:MARGIN, right:MARGIN },
-        head: [['Time','Table','Event','Battery %','Battery Status']],
-        body: sorted.map(e => {
-          const ts = e.dismissedAt||e.calledAt;
-          return [
-            ts ? formatTime(ts) : '—',
-            'Table '+e.table,
-            e.status==='dismissed' ? 'Call handled' : 'Table called',
-            e.batt+'%',
-            e.batt<20 ? 'LOW' : e.batt<40 ? 'Medium' : 'Good'
-          ];
+        startY:y, margin:{left:MARGIN,right:MARGIN},
+        head:[['Heure','Table','Événement','Batterie','État batterie']],
+        body:sorted.map(e=>{
+          const ts=e.dismissedAt||e.calledAt;
+          return [ts?formatTime(ts):'—','Table '+e.table,
+            e.status==='dismissed'?'Appel traité':'Appel entrant',
+            e.batt+'%', e.batt<20?'FAIBLE':e.batt<40?'Moyenne':'Bonne'];
         }),
-        styles:     { fontSize:8, cellPadding:3, font:'helvetica', textColor:LIGHT, fillColor:BROWN },
-        headStyles: { fillColor:DARK, textColor:ACCENT, fontStyle:'bold', fontSize:7.5 },
-        alternateRowStyles: { fillColor:[35,22,10] },
-        columnStyles: {
-          0:{fontStyle:'bold'},
-          2:{cellWidth:40},
-          3:{halign:'center'},
-          4:{halign:'center'}
-        },
-        didParseCell: (data) => {
+        styles:{fontSize:8,cellPadding:3.5,font:'helvetica',textColor:LIGHT,fillColor:BROWN},
+        headStyles:{fillColor:DARK,textColor:MIDLIT,fontStyle:'bold',fontSize:7.5},
+        alternateRowStyles:{fillColor:[38,24,12]},
+        columnStyles:{0:{fontStyle:'bold'},2:{cellWidth:40},3:{halign:'center'},4:{halign:'center'}},
+        didParseCell:(data)=>{
           if (data.section==='body') {
             if (data.column.index===4) {
-              const v = data.cell.raw;
-              data.cell.styles.textColor = v==='LOW' ? RED : v==='Medium' ? [208,128,32] : GREEN;
+              const v=data.cell.raw;
+              data.cell.styles.textColor=v==='FAIBLE'?RED:v==='Moyenne'?[220,140,40]:GREEN;
             }
             if (data.column.index===2) {
-              data.cell.styles.textColor = data.cell.raw==='Call handled' ? GREEN : [200,115,42];
+              data.cell.styles.textColor=data.cell.raw==='Appel traité'?GREEN:ACCENT;
             }
           }
         }
       });
 
-      /* Footer on each page */
+      /* Pied de page */
       const pageCount = doc.internal.getNumberOfPages();
-      for (let i=1; i<=pageCount; i++) {
+      for (let i=1;i<=pageCount;i++) {
         doc.setPage(i);
-        doc.setFillColor(...BROWN);
-        doc.rect(0, 290, W, 7, 'F');
-        doc.setTextColor(...[120,90,60]);
-        doc.setFontSize(7);
-        doc.setFont('helvetica','normal');
+        doc.setFillColor(...BROWN); doc.rect(0,290,W,7,'F');
+        doc.setFillColor(...ACCENT); doc.rect(0,290,W,0.8,'F');
+        doc.setTextColor(150,110,60); doc.setFontSize(7); doc.setFont('helvetica','normal');
         doc.text('Café Manager · '+selectedDate, MARGIN, 294.5);
-        doc.text('Page '+i+' of '+pageCount, W-MARGIN, 294.5, {align:'right'});
+        doc.text('Page '+i+' / '+pageCount, W-MARGIN, 294.5, {align:'right'});
       }
 
-      doc.save(`cafe-report-${selectedDate}.pdf`);
+      doc.save('rapport-cafe-'+selectedDate+'.pdf');
     }
 
-    /* ─── SEED DEMO DATA ─── */
+    /* ── DONNÉES DÉMO ── */
     function seedDemoData() {
       const log = loadLog();
       if (Object.keys(log).length>0) return;
-      const batts = {'01':88,'02':72,'03':12,'04':60,'05':34,'06':98,'07':45,'08':82,'09':19,'10':91,'11':55,'12':67};
-
-      function mk(daysAgo,h,m) {
-        const d=new Date(); d.setDate(d.getDate()-daysAgo); d.setHours(h,m,0,0); return d.toISOString();
-      }
-      function add(daysAgo, evts) {
-        const d=new Date(); d.setDate(d.getDate()-daysAgo);
-        const k=d.toISOString().slice(0,10);
-        if (!log[k]) log[k]={events:[]};
-        evts.forEach(e=>log[k].events.push(e));
-      }
-
+      const batts={'01':88,'02':72,'03':12,'04':60,'05':34,'06':98,'07':45,'08':82,'09':19,'10':91,'11':55,'12':67};
+      function mk(da,h,m){const d=new Date();d.setDate(d.getDate()-da);d.setHours(h,m,0,0);return d.toISOString();}
+      function add(da,evts){const d=new Date();d.setDate(d.getDate()-da);const k=d.toISOString().slice(0,10);if(!log[k])log[k]={events:[]};evts.forEach(e=>log[k].events.push(e));}
       add(1,[
-        {table:'03',batt:batts['03'],dismissedAt:mk(1,9,14),  status:'dismissed'},
-        {table:'07',batt:batts['07'],dismissedAt:mk(1,10,32), status:'dismissed'},
-        {table:'01',batt:batts['01'],dismissedAt:mk(1,11,5),  status:'dismissed'},
-        {table:'02',batt:batts['02'],dismissedAt:mk(1,11,47), status:'dismissed'},
-        {table:'10',batt:batts['10'],dismissedAt:mk(1,13,20), status:'dismissed'},
-        {table:'05',batt:batts['05'],dismissedAt:mk(1,14,3),  status:'dismissed'},
-        {table:'09',batt:19,         dismissedAt:mk(1,15,50), status:'dismissed'},
-        {table:'03',batt:batts['03'],dismissedAt:mk(1,16,22), status:'dismissed'},
+        {table:'03',batt:batts['03'],dismissedAt:mk(1,9,14), status:'dismissed'},
+        {table:'07',batt:batts['07'],dismissedAt:mk(1,10,32),status:'dismissed'},
+        {table:'01',batt:batts['01'],dismissedAt:mk(1,11,5), status:'dismissed'},
+        {table:'02',batt:batts['02'],dismissedAt:mk(1,11,47),status:'dismissed'},
+        {table:'10',batt:batts['10'],dismissedAt:mk(1,13,20),status:'dismissed'},
+        {table:'05',batt:batts['05'],dismissedAt:mk(1,14,3), status:'dismissed'},
+        {table:'09',batt:19,         dismissedAt:mk(1,15,50),status:'dismissed'},
+        {table:'03',batt:batts['03'],dismissedAt:mk(1,16,22),status:'dismissed'},
       ]);
       add(2,[
-        {table:'06',batt:batts['06'],dismissedAt:mk(2,8,40),  status:'dismissed'},
-        {table:'11',batt:batts['11'],dismissedAt:mk(2,9,55),  status:'dismissed'},
-        {table:'04',batt:batts['04'],dismissedAt:mk(2,12,10), status:'dismissed'},
-        {table:'08',batt:batts['08'],dismissedAt:mk(2,13,45), status:'dismissed'},
-        {table:'12',batt:batts['12'],dismissedAt:mk(2,14,30), status:'dismissed'},
+        {table:'06',batt:batts['06'],dismissedAt:mk(2,8,40), status:'dismissed'},
+        {table:'11',batt:batts['11'],dismissedAt:mk(2,9,55), status:'dismissed'},
+        {table:'04',batt:batts['04'],dismissedAt:mk(2,12,10),status:'dismissed'},
+        {table:'08',batt:batts['08'],dismissedAt:mk(2,13,45),status:'dismissed'},
+        {table:'12',batt:batts['12'],dismissedAt:mk(2,14,30),status:'dismissed'},
       ]);
       add(3,[
-        {table:'01',batt:batts['01'],dismissedAt:mk(3,10,5),  status:'dismissed'},
-        {table:'02',batt:batts['02'],dismissedAt:mk(3,11,20), status:'dismissed'},
-        {table:'03',batt:12,         dismissedAt:mk(3,12,0),  status:'dismissed'},
-        {table:'07',batt:batts['07'],dismissedAt:mk(3,13,35), status:'dismissed'},
-        {table:'10',batt:batts['10'],dismissedAt:mk(3,15,10), status:'dismissed'},
-        {table:'09',batt:19,         dismissedAt:mk(3,17,45), status:'dismissed'},
+        {table:'01',batt:batts['01'],dismissedAt:mk(3,10,5), status:'dismissed'},
+        {table:'02',batt:batts['02'],dismissedAt:mk(3,11,20),status:'dismissed'},
+        {table:'03',batt:12,         dismissedAt:mk(3,12,0), status:'dismissed'},
+        {table:'07',batt:batts['07'],dismissedAt:mk(3,13,35),status:'dismissed'},
+        {table:'10',batt:batts['10'],dismissedAt:mk(3,15,10),status:'dismissed'},
+        {table:'09',batt:19,         dismissedAt:mk(3,17,45),status:'dismissed'},
       ]);
       saveLog(log);
     }
 
-    /* ─── INIT ─── */
+    /* ── INIT ── */
     seedDemoData();
     updateClock();
     setInterval(updateClock, 1000);
